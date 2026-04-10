@@ -1,0 +1,22 @@
+<nav class="navbar">
+  <a routerLink="/" class="brand">🏆 Kudos</a>
+
+  <div class="nav-links">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Feed</a>
+    <a routerLink="/leaderboard" routerLinkActive="active">Leaderboard</a>
+    @if (auth.isAdmin()) {
+      <a routerLink="/admin" routerLinkActive="active">Admin</a>
+    }
+  </div>
+
+  <div class="nav-right">
+    <a routerLink="/profile" routerLinkActive="active" class="user-link">
+      {{ auth.currentUser()?.fullName }}
+    </a>
+    <button class="btn-logout" (click)="auth.logout()">Logout</button>
+  </div>
+</nav>
+
+<main class="content">
+  <router-outlet />
+</main>

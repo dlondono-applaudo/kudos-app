@@ -1,0 +1,74 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <h1>Create Account</h1>
+    <p class="subtitle">Join the Kudos community</p>
+
+    @if (error()) {
+      <div class="error-banner">{{ error() }}</div>
+    }
+
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+      <div class="field">
+        <label for="fullName">Full Name</label>
+        <input
+          id="fullName"
+          type="text"
+          [(ngModel)]="fullName"
+          name="fullName"
+          required
+          placeholder="Jane Doe"
+        />
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          required
+          email
+          placeholder="you@company.com"
+        />
+      </div>
+
+      <div class="field">
+        <label for="department">Department</label>
+        <input
+          id="department"
+          type="text"
+          [(ngModel)]="department"
+          name="department"
+          required
+          placeholder="Engineering"
+        />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          required
+          minlength="6"
+          placeholder="••••••••"
+        />
+      </div>
+
+      <button type="submit" [disabled]="registerForm.invalid || loading()">
+        @if (loading()) {
+          Creating account...
+        } @else {
+          Create Account
+        }
+      </button>
+    </form>
+
+    <p class="switch-link">
+      Already have an account? <a routerLink="/login">Sign in</a>
+    </p>
+  </div>
+</div>
