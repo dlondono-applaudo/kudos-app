@@ -30,6 +30,36 @@ A peer-to-peer employee recognition application where employees give each other 
 - `shared/` — Domain types, signal stores, API services, reusable UI components
 - `features/` — Lazy-loaded routes (auth, feed, profile, leaderboard, admin)
 
+```mermaid
+graph TD
+    subgraph Frontend["Angular 20 - localhost:4200"]
+        UI[Standalone Components]
+        Signals[Signal Stores]
+        HTTP[HttpClient + Interceptor]
+    end
+
+    subgraph Backend[".NET 10 API - localhost:5000"]
+        Controllers[Controllers]
+        Services[Services]
+        subgraph Core["Core Layer"]
+            Entities[Entities]
+            Interfaces[Interfaces]
+        end
+        subgraph Infra["Infrastructure Layer"]
+            EF[EF Core + SQLite]
+            OpenAI[OpenAI Service]
+        end
+    end
+
+    UI --> Signals
+    Signals --> HTTP
+    HTTP -->|REST API| Controllers
+    Controllers --> Services
+    Services --> Entities
+    Services --> EF
+    Services --> OpenAI
+```
+
 ## Setup & Run
 
 ### Prerequisites
@@ -63,23 +93,43 @@ ng serve
 ## Features
 
 ### Core (Minimum Requirements)
-- [ ] User registration and login (JWT)
-- [ ] Give kudos to another employee (recipient, category, message)
-- [ ] Public kudos feed
-- [ ] Points system (categories have different point values)
-- [ ] Role-based access (User / Admin)
-- [ ] SQLite database
-- [ ] Angular Web UI
+- [x] User registration and login (JWT)
+- [x] Give kudos to another employee (recipient, category, message)
+- [x] Public kudos feed
+- [x] Points system (categories have different point values)
+- [x] Role-based access (User / Admin)
+- [x] SQLite database
+- [x] Angular Web UI
 
 ### Extended
-- [ ] Badges and achievements
-- [ ] Leaderboard
-- [ ] Admin dashboard with analytics
-- [ ] Notifications (in-app)
-- [ ] Audit logging
+- [x] Badges and achievements
+- [x] Leaderboard
+- [x] Admin dashboard with analytics
+- [x] Notifications (in-app)
+- [x] Audit logging
 
 ### AI Features
-- [ ] AI Content Moderation — validates kudos messages are appropriate, professional, and genuine before posting
+- [x] AI Content Moderation — validates kudos messages are appropriate, professional, and genuine before posting
+- [x] Smart Compose — AI generates kudos message suggestions based on category and intent
+- [x] Sentiment Analysis — assigns emoji tag to each kudos based on message tone
+
+## Running Tests
+
+```bash
+cd backend
+dotnet test tests/KudosApp.Tests/KudosApp.Tests.csproj
+```
+
+**Test coverage** (45 tests):
+- `AuthControllerTests` — registration, login, duplicate email, wrong password
+- `KudosControllerTests` — feed access, auth enforcement, create kudos, admin-only delete, health check
+- `CategoriesControllerTests` — seeded categories, point values, anonymous access
+- `LeaderboardControllerTests` — anonymous access, ranked entries after kudos
+- `NotificationsControllerTests` — auth enforcement, unread count, mark read, kudos-triggered notifications
+- `UsersControllerTests` — profile retrieval, user listing, anonymous profile access
+- `KudosEntityTests` — entity creation, self-kudos guard, empty message guard, sentiment emoji
+- `EntityTests` — ApplicationUser, Category, Badge, UserBadge, Notification, AuditLog factories
+- `OpenAiServiceTests` — fallback responses without API key, auto-approval
 
 ## AI Tools Used
 
@@ -91,6 +141,36 @@ ng serve
 ## AI Artifacts
 - [`.github/copilot-instructions.md`](.github/copilot-instructions.md) — Project context for Copilot
 - [`CLAUDE.md`](CLAUDE.md) — Project rules for Claude
+
+## Default Credentials
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@kudos.com | Admin123! |
+| User | user@kudos.com | User123! |
+
+## API Endpoints
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/register` | — | Register new user |
+| POST | `/api/auth/login` | — | Login, get JWT |
+| GET | `/api/kudos` | — | Public kudos feed |
+| POST | `/api/kudos` | Bearer | Send kudos |
+| GET | `/api/kudos/{id}` | — | Get single kudos |
+| GET | `/api/kudos/sent` | Bearer | My sent kudos |
+| GET | `/api/kudos/received` | Bearer | My received kudos |
+| DELETE | `/api/kudos/{id}` | Admin | Delete kudos |
+| GET | `/api/categories` | — | List categories |
+| GET | `/api/leaderboard` | — | Points leaderboard |
+| GET | `/api/users` | Bearer | All users |
+| GET | `/api/users/me` | Bearer | My profile |
+| GET | `/api/users/{id}` | — | User profile |
+| GET | `/api/notifications` | Bearer | My notifications |
+| POST | `/api/notifications/{id}/read` | Bearer | Mark read |
+| POST | `/api/notifications/read-all` | Bearer | Mark all read |
+| POST | `/api/ai/suggest-message` | Bearer | AI message suggestions |
+| GET | `/health` | — | Health check |
 
 ## What I Would Do Next
 - Migrate to PostgreSQL for production (SQLite is single-writer)
