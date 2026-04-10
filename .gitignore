@@ -402,6 +402,23 @@ FodyWeavers.xsd
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Angular / Frontend
+frontend/dist/
+frontend/.angular/
+frontend/node_modules/
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+
+# Environment
+.env
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 !.vscode/*.code-snippets
 
 # Local History for Visual Studio Code

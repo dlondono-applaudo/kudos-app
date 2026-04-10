@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/KudosApp.Api/KudosApp.Api.csproj" />
+    <Project Path="src/KudosApp.Core/KudosApp.Core.csproj" />
+    <Project Path="src/KudosApp.Infrastructure/KudosApp.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/KudosApp.Tests/KudosApp.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,36 @@
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/kudos.db
+      - Jwt__Secret=${JWT_SECRET:-SuperSecretKeyForDevelopmentOnly32Chars!}
+      - Jwt__Issuer=${JWT_ISSUER:-KudosApp}
+      - Jwt__Audience=${JWT_AUDIENCE:-KudosApp}
+      - OpenAI__ApiKey=${OPENAI_API_KEY:-}
+      - OpenAI__Model=${OPENAI_MODEL:-gpt-4o-mini}
+    volumes:
+      - api-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  ui:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  api-data:
