@@ -6,10 +6,10 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5000
       - ConnectionStrings__DefaultConnection=Data Source=/app/data/kudos.db
-      - Jwt__Secret=${JWT_SECRET:-SuperSecretKeyForDevelopmentOnly32Chars!}
+      - Jwt__Key=${JWT_SECRET:-KudosApp-SuperSecret-Key-Change-In-Production-Min32Chars!}
       - Jwt__Issuer=${JWT_ISSUER:-KudosApp}
       - Jwt__Audience=${JWT_AUDIENCE:-KudosApp}
       - OpenAI__ApiKey=${OPENAI_API_KEY:-}

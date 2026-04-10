@@ -7,11 +7,11 @@ COPY src/KudosApp.Core/KudosApp.Core.csproj src/KudosApp.Core/
 COPY src/KudosApp.Infrastructure/KudosApp.Infrastructure.csproj src/KudosApp.Infrastructure/
 COPY src/KudosApp.Api/KudosApp.Api.csproj src/KudosApp.Api/
 
-RUN dotnet restore KudosApp.slnx
+RUN dotnet restore src/KudosApp.Api/KudosApp.Api.csproj
 
 COPY src/ src/
 WORKDIR /src/src/KudosApp.Api
-RUN dotnet publish -c Release -o /app/publish --no-restore
+RUN dotnet publish -c Release -o /app/publish
 
 # Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime

@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+*.user
+*.db
+*.log
+.git/
+.gitignore
+**/*.md
+tests/
