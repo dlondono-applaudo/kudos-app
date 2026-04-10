@@ -16,6 +16,7 @@ public static class DependencyInjection
             options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IKudosService, KudosService>();
 
         return services;
     }
