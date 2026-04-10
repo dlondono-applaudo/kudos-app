@@ -1,0 +1,29 @@
+<div class="page-header">
+  <h1>Leaderboard</h1>
+  <p>Top contributors by kudos points</p>
+</div>
+
+@if (loading()) {
+  <p class="loading">Loading...</p>
+} @else if (entries().length === 0) {
+  <p class="empty">No data yet</p>
+} @else {
+  <div class="leaderboard-table">
+    <div class="table-header">
+      <span class="col-rank">Rank</span>
+      <span class="col-name">Name</span>
+      <span class="col-dept">Department</span>
+      <span class="col-kudos">Kudos</span>
+      <span class="col-points">Points</span>
+    </div>
+    @for (entry of entries(); track entry.userId) {
+      <div class="table-row" [class.top-3]="entry.rank <= 3">
+        <span class="col-rank">{{ medal(entry.rank) }}</span>
+        <span class="col-name">{{ entry.fullName }}</span>
+        <span class="col-dept">{{ entry.department }}</span>
+        <span class="col-kudos">{{ entry.kudosReceived }}</span>
+        <span class="col-points">{{ entry.totalPoints }}</span>
+      </div>
+    }
+  </div>
+}

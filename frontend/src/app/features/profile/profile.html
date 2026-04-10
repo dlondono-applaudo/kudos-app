@@ -1,0 +1,43 @@
+@if (loading()) {
+  <p class="loading">Loading...</p>
+} @else if (profile(); as p) {
+  <div class="profile-header">
+    <div class="avatar">{{ p.fullName.charAt(0) }}</div>
+    <div>
+      <h1>{{ p.fullName }}</h1>
+      <p class="meta">{{ p.email }} · {{ p.department }}</p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-value">{{ p.totalPointsReceived }}</span>
+      <span class="stat-label">Points</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ p.kudosReceived }}</span>
+      <span class="stat-label">Received</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ p.kudosSent }}</span>
+      <span class="stat-label">Sent</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ p.badges.length }}</span>
+      <span class="stat-label">Badges</span>
+    </div>
+  </div>
+
+  @if (p.badges.length > 0) {
+    <h2>Badges</h2>
+    <div class="badges-grid">
+      @for (badge of p.badges; track badge.name) {
+        <div class="badge-card">
+          <span class="badge-icon">{{ badge.icon || '🏅' }}</span>
+          <span class="badge-name">{{ badge.name }}</span>
+          <span class="badge-desc">{{ badge.description }}</span>
+        </div>
+      }
+    </div>
+  }
+}

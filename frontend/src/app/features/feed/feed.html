@@ -1,0 +1,80 @@
+<div class="page-header">
+  <h1>Kudos Feed</h1>
+  <button class="btn-primary" (click)="toggleForm()">
+    @if (showForm()) { Cancel } @else { + Give Kudos }
+  </button>
+</div>
+
+@if (showForm()) {
+  <div class="card give-kudos-form">
+    <h2>Give Kudos</h2>
+    @if (sendError()) {
+      <div class="error-banner">{{ sendError() }}</div>
+    }
+    <div class="form-grid">
+      <div class="field">
+        <label for="receiver">To</label>
+        <select id="receiver" [(ngModel)]="receiverId">
+          <option value="">Select a person...</option>
+          @for (user of users(); track user.id) {
+            <option [value]="user.id">{{ user.fullName }} ({{ user.department }})</option>
+          }
+        </select>
+      </div>
+      <div class="field">
+        <label for="category">Category</label>
+        <select id="category" [(ngModel)]="categoryId">
+          <option [value]="0">Select a category...</option>
+          @for (cat of categories(); track cat.id) {
+            <option [value]="cat.id">{{ cat.name }} ({{ cat.pointValue }} pts)</option>
+          }
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="message">Message</label>
+      <textarea
+        id="message"
+        [(ngModel)]="message"
+        rows="3"
+        placeholder="Tell them why they're awesome..."
+      ></textarea>
+    </div>
+    <button class="btn-primary" (click)="sendKudos()" [disabled]="sending()">
+      @if (sending()) { Sending... } @else { Send Kudos 🎉 }
+    </button>
+  </div>
+}
+
+@if (loading()) {
+  <p class="loading">Loading...</p>
+} @else if (items().length === 0) {
+  <div class="empty-state">
+    <p>No kudos yet. Be the first to recognize someone!</p>
+  </div>
+} @else {
+  <div class="feed">
+    @for (item of items(); track item.id) {
+      <div class="kudos-card">
+        <div class="kudos-header">
+          <span class="sender">{{ item.senderName }}</span>
+          <span class="arrow">→</span>
+          <span class="receiver">{{ item.receiverName }}</span>
+          <span class="badge-cat">{{ item.categoryName }}</span>
+          <span class="points">+{{ item.points }} pts</span>
+        </div>
+        <p class="kudos-message">{{ item.message }}</p>
+        <div class="kudos-footer">
+          <span class="dept">{{ item.senderDepartment }}</span>
+          <span class="time">{{ timeAgo(item.createdAt) }}</span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="pagination">
+    <button (click)="prevPage()" [disabled]="page() <= 1">← Prev</button>
+    <span>Page {{ page() }}</span>
+    <button (click)="nextPage()" [disabled]="items().length < 20">Next →</button>
+  </div>
+}

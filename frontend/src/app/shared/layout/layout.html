@@ -4,6 +4,7 @@
   <div class="nav-links">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Feed</a>
     <a routerLink="/leaderboard" routerLinkActive="active">Leaderboard</a>
+    <a routerLink="/notifications" routerLinkActive="active">Notifications</a>
     @if (auth.isAdmin()) {
       <a routerLink="/admin" routerLinkActive="active">Admin</a>
     }

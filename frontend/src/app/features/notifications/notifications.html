@@ -1,0 +1,27 @@
+<div class="page-header">
+  <h1>Notifications</h1>
+  @if (items().length > 0) {
+    <button class="btn-secondary" (click)="markAllRead()">Mark all read</button>
+  }
+</div>
+
+@if (loading()) {
+  <p class="loading">Loading...</p>
+} @else if (items().length === 0) {
+  <p class="empty">No notifications yet</p>
+} @else {
+  <div class="notification-list">
+    @for (item of items(); track item.id) {
+      <div class="notification-item" [class.unread]="!item.isRead">
+        <div class="notification-dot" [class.visible]="!item.isRead"></div>
+        <div class="notification-body">
+          <p class="notification-message">{{ item.message }}</p>
+          <span class="notification-time">{{ timeAgo(item.createdAt) }}</span>
+        </div>
+        @if (!item.isRead) {
+          <button class="btn-mark" (click)="markRead(item.id)">✓</button>
+        }
+      </div>
+    }
+  </div>
+}

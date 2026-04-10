@@ -1,0 +1,39 @@
+<div class="page-header">
+  <h1>Admin Dashboard</h1>
+</div>
+
+<div class="admin-grid">
+  <section class="panel">
+    <h2>Users ({{ users().length }})</h2>
+    <div class="user-list">
+      @for (user of users(); track user.id) {
+        <div class="user-row">
+          <div class="user-avatar">{{ user.fullName.charAt(0) }}</div>
+          <div>
+            <div class="user-name">{{ user.fullName }}</div>
+            <div class="user-meta">{{ user.email }} · {{ user.department }}</div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Recent Kudos</h2>
+    @if (loading()) {
+      <p class="loading">Loading...</p>
+    } @else {
+      <div class="kudos-list">
+        @for (item of recentKudos(); track item.id) {
+          <div class="kudos-row">
+            <div class="kudos-info">
+              <span class="names">{{ item.senderName }} → {{ item.receiverName }}</span>
+              <span class="msg">{{ item.message }}</span>
+            </div>
+            <button class="btn-delete" (click)="deleteKudos(item.id)">🗑</button>
+          </div>
+        }
+      </div>
+    }
+  </section>
+</div>
