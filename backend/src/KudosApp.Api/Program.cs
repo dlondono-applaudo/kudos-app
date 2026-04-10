@@ -6,6 +6,25 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
+// Load .env file BEFORE building host (maps OPENAI_API_KEY → OpenAI__ApiKey for .NET config)
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", ".env");
+if (File.Exists(envPath))
+{
+    foreach (var line in File.ReadAllLines(envPath))
+    {
+        if (string.IsNullOrWhiteSpace(line) || line.StartsWith('#')) continue;
+        var parts = line.Split('=', 2);
+        if (parts.Length == 2)
+            Environment.SetEnvironmentVariable(parts[0].Trim(), parts[1].Trim());
+    }
+    var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+    var model = Environment.GetEnvironmentVariable("OPENAI_MODEL");
+    if (!string.IsNullOrWhiteSpace(apiKey))
+        Environment.SetEnvironmentVariable("OpenAI__ApiKey", apiKey);
+    if (!string.IsNullOrWhiteSpace(model))
+        Environment.SetEnvironmentVariable("OpenAI__Model", model);
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Infrastructure (DbContext, services)

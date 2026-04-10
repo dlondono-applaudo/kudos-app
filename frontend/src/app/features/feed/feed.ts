@@ -25,6 +25,11 @@ export class Feed implements OnInit {
   sendError = signal('');
   sending = signal(false);
 
+  // AI suggest
+  suggestIntent = '';
+  suggestions = signal<string[]>([]);
+  suggesting = signal(false);
+
   constructor(
     private kudosService: KudosService,
     protected auth: AuthService,
@@ -64,6 +69,26 @@ export class Feed implements OnInit {
   toggleForm() {
     this.showForm.update(v => !v);
     this.sendError.set('');
+    this.suggestions.set([]);
+    this.suggestIntent = '';
+  }
+
+  suggestMessages() {
+    const cat = this.categories().find(c => c.id === +this.categoryId);
+    if (!cat || !this.suggestIntent.trim()) return;
+    this.suggesting.set(true);
+    this.kudosService.suggestMessage(cat.name, this.suggestIntent.trim()).subscribe({
+      next: res => {
+        this.suggestions.set(res.suggestions);
+        this.suggesting.set(false);
+      },
+      error: () => this.suggesting.set(false),
+    });
+  }
+
+  useSuggestion(text: string) {
+    this.message = text;
+    this.suggestions.set([]);
   }
 
   sendKudos() {
@@ -84,6 +109,8 @@ export class Feed implements OnInit {
         this.receiverId = '';
         this.categoryId = 0;
         this.message = '';
+        this.suggestions.set([]);
+        this.suggestIntent = '';
         this.page.set(1);
         this.loadFeed();
       },

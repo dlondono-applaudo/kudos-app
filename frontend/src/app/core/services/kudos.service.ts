@@ -67,4 +67,11 @@ export class KudosService {
   getUsers() {
     return this.http.get<UserListItem[]>(`${this.api}/users`);
   }
+
+  suggestMessage(categoryName: string, intent: string) {
+    return this.http.post<{ suggestions: string[] }>(`${this.api}/ai/suggest-message`, {
+      categoryName,
+      intent,
+    });
+  }
 }

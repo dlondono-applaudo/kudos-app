@@ -8,6 +8,7 @@ public class Kudos
     public int CategoryId { get; private set; }
     public string Message { get; private set; } = string.Empty;
     public int Points { get; private set; }
+    public string? SentimentEmoji { get; private set; }
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
     // Navigation properties
@@ -34,5 +35,10 @@ public class Kudos
             Points = points,
             CreatedAt = DateTime.UtcNow
         };
+    }
+
+    public void SetSentimentEmoji(string? emoji)
+    {
+        SentimentEmoji = emoji;
     }
 }

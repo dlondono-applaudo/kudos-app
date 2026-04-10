@@ -17,6 +17,7 @@ public record KudosResponse(
     string CategoryName,
     string Message,
     int Points,
+    string? SentimentEmoji,
     DateTime CreatedAt
 );
 

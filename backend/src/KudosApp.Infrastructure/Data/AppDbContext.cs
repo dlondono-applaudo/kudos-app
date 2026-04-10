@@ -52,6 +52,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             entity.HasKey(k => k.Id);
             entity.Property(k => k.Message).HasMaxLength(500).IsRequired();
             entity.Property(k => k.Points).IsRequired();
+            entity.Property(k => k.SentimentEmoji).HasMaxLength(10);
             entity.Property(k => k.CreatedAt).IsRequired();
 
             entity.HasOne(k => k.Sender)

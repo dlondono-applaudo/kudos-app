@@ -9,10 +9,12 @@ namespace KudosApp.Infrastructure.Services;
 public class KudosService : IKudosService
 {
     private readonly AppDbContext _context;
+    private readonly IContentModerationService _moderation;
 
-    public KudosService(AppDbContext context)
+    public KudosService(AppDbContext context, IContentModerationService moderation)
     {
         _context = context;
+        _moderation = moderation;
     }
 
     public async Task<KudosResponse> CreateAsync(string senderId, CreateKudosRequest request)
@@ -20,12 +22,19 @@ public class KudosService : IKudosService
         var category = await _context.Categories.FindAsync(request.CategoryId)
             ?? throw new ArgumentException("Category not found.");
 
+        // AI moderation + sentiment analysis
+        var moderationResult = await _moderation.ValidateAndAnalyzeAsync(request.Message, category.Name);
+        if (!moderationResult.IsApproved)
+            throw new InvalidOperationException($"Message rejected: {moderationResult.Reason}");
+
         var kudos = Kudos.Create(
             senderId,
             request.ReceiverId,
             request.CategoryId,
             request.Message,
             category.PointValue);
+
+        kudos.SetSentimentEmoji(moderationResult.SentimentEmoji);
 
         _context.Kudos.Add(kudos);
 
@@ -67,6 +76,7 @@ public class KudosService : IKudosService
                 k.Category.Name,
                 k.Message,
                 k.Points,
+                k.SentimentEmoji,
                 k.CreatedAt))
             .ToListAsync();
 
@@ -93,7 +103,7 @@ public class KudosService : IKudosService
             .Select(k => new KudosResponse(
                 k.Id, k.SenderId, k.Sender.FullName,
                 k.ReceiverId, k.Receiver.FullName,
-                k.Category.Name, k.Message, k.Points, k.CreatedAt))
+                k.Category.Name, k.Message, k.Points, k.SentimentEmoji, k.CreatedAt))
             .ToListAsync();
     }
 
@@ -106,7 +116,7 @@ public class KudosService : IKudosService
             .Select(k => new KudosResponse(
                 k.Id, k.SenderId, k.Sender.FullName,
                 k.ReceiverId, k.Receiver.FullName,
-                k.Category.Name, k.Message, k.Points, k.CreatedAt))
+                k.Category.Name, k.Message, k.Points, k.SentimentEmoji, k.CreatedAt))
             .ToListAsync();
     }
 
@@ -164,6 +174,7 @@ public class KudosService : IKudosService
             kudos.Category.Name,
             kudos.Message,
             kudos.Points,
+            kudos.SentimentEmoji,
             kudos.CreatedAt);
     }
 }

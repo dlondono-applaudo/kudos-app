@@ -18,6 +18,11 @@ public static class DependencyInjection
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IKudosService, KudosService>();
 
+        // AI services
+        services.AddSingleton<OpenAiService>();
+        services.AddSingleton<IAiSuggestionService>(sp => sp.GetRequiredService<OpenAiService>());
+        services.AddSingleton<IContentModerationService>(sp => sp.GetRequiredService<OpenAiService>());
+
         return services;
     }
 }

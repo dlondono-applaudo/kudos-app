@@ -7,6 +7,7 @@ export interface KudosItem {
   categoryName: string;
   message: string;
   points: number;
+  sentimentEmoji: string | null;
   createdAt: string;
 }
 

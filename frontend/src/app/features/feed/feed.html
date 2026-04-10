@@ -40,6 +40,30 @@
         placeholder="Tell them why they're awesome..."
       ></textarea>
     </div>
+    <div class="ai-suggest">
+      <div class="suggest-row">
+        <input
+          type="text"
+          [(ngModel)]="suggestIntent"
+          placeholder="Describe what they did (e.g., 'helped me debug a tricky issue')..."
+          class="suggest-input"
+        />
+        <button
+          class="btn-suggest"
+          (click)="suggestMessages()"
+          [disabled]="suggesting() || !categoryId || !suggestIntent.trim()"
+        >
+          @if (suggesting()) { Thinking... } @else { ✨ Suggest }
+        </button>
+      </div>
+      @if (suggestions().length > 0) {
+        <div class="suggestion-cards">
+          @for (s of suggestions(); track $index) {
+            <button class="suggestion-card" (click)="useSuggestion(s)">{{ s }}</button>
+          }
+        </div>
+      }
+    </div>
     <button class="btn-primary" (click)="sendKudos()" [disabled]="sending()">
       @if (sending()) { Sending... } @else { Send Kudos 🎉 }
     </button>
@@ -61,6 +85,9 @@
           <span class="arrow">→</span>
           <span class="receiver">{{ item.receiverName }}</span>
           <span class="badge-cat">{{ item.categoryName }}</span>
+          @if (item.sentimentEmoji) {
+            <span class="sentiment">{{ item.sentimentEmoji }}</span>
+          }
           <span class="points">+{{ item.points }} pts</span>
         </div>
         <p class="kudos-message">{{ item.message }}</p>
