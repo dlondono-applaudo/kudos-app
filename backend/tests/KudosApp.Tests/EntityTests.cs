@@ -1,4 +1,4 @@
-using KudosApp.Core.Entities;
+using KudosApp.Domain.Entities;
 
 namespace KudosApp.Tests;
 

@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
-using KudosApp.Core.DTOs.Kudos;
-using KudosApp.Core.DTOs.Notifications;
+using KudosApp.Domain.DTOs.Kudos;
+using KudosApp.Domain.DTOs.Notifications;
 
 namespace KudosApp.Tests;
 

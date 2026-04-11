@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
-using KudosApp.Core.DTOs.Categories;
+using KudosApp.Domain.DTOs.Categories;
 
 namespace KudosApp.Tests;
 

@@ -1,4 +1,4 @@
-using KudosApp.Infrastructure.Services;
+using KudosApp.Application.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 

@@ -10,7 +10,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5000
       - ConnectionStrings__DefaultConnection=Data Source=/app/data/kudos.db
-      - Jwt__Key=${JWT_SECRET:-KudosApp-SuperSecret-Key-Change-In-Production-Min32Chars!}
+      - Jwt__Key=${JWT_SECRET}
       - Jwt__Issuer=${JWT_ISSUER:-KudosApp}
       - Jwt__Audience=${JWT_AUDIENCE:-KudosApp}
       - OpenAI__ApiKey=${OPENAI_API_KEY:-}
@@ -33,6 +33,11 @@ services:
     depends_on:
       api:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   api-data:

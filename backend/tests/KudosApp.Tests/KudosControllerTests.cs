@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
-using KudosApp.Core.DTOs.Kudos;
+using KudosApp.Domain.DTOs.Kudos;
 
 namespace KudosApp.Tests;
 
@@ -58,7 +58,7 @@ public class KudosControllerTests : IClassFixture<CustomWebApplicationFactory>
         // Let's create a second client for the receiver
         var client2 = _factory.CreateClient();
         var regResponse = await client2.PostAsJsonAsync("/api/auth/register",
-            new Core.DTOs.Auth.RegisterRequest("receiver-k2@example.com", "Test123!", "Receiver 2", "Engineering"));
+            new Domain.DTOs.Auth.RegisterRequest("receiver-k2@example.com", "Test123!", "Receiver 2", "Engineering"));
         regResponse.EnsureSuccessStatusCode();
 
         // The user ID is an identity GUID - we can get it from users endpoint if it exists

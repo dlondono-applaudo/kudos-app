@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using KudosApp.Core.DTOs.Auth;
+using KudosApp.Domain.DTOs.Auth;
 
 namespace KudosApp.Tests;
 

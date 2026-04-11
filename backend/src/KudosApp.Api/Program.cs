@@ -1,10 +1,13 @@
 using System.Text;
-using KudosApp.Core.Entities;
+using KudosApp.Api.Endpoints;
+using KudosApp.Application;
+using KudosApp.Domain.Entities;
 using KudosApp.Infrastructure;
 using KudosApp.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 
 // Load .env file BEFORE building host (maps OPENAI_API_KEY → OpenAI__ApiKey for .NET config)
 var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", ".env");
@@ -27,7 +30,10 @@ if (File.Exists(envPath))
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Infrastructure (DbContext, services)
+// Application (services, validators)
+builder.Services.AddApplication();
+
+// Infrastructure (DbContext)
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // Identity
@@ -45,8 +51,9 @@ builder.Services
     .AddDefaultTokenProviders();
 
 // JWT Authentication
-var jwtKey = builder.Configuration["Jwt:Key"]
-    ?? throw new InvalidOperationException("JWT Key is not configured.");
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey))
+    throw new InvalidOperationException("JWT Key is not configured. Set Jwt__Key environment variable.");
 
 builder.Services
     .AddAuthentication(options =>
@@ -70,8 +77,7 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
-// Controllers + OpenAPI
-builder.Services.AddControllers();
+// OpenAPI
 builder.Services.AddOpenApi();
 
 // Response compression
@@ -97,9 +103,18 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Seed roles and admin user
+// Ensure database directory exists and seed roles
 using (var scope = app.Services.CreateScope())
 {
+    var connStr = scope.ServiceProvider.GetRequiredService<IConfiguration>()
+        .GetConnectionString("DefaultConnection") ?? "";
+    var dbFile = connStr.Replace("Data Source=", "");
+    if (!string.IsNullOrEmpty(dbFile))
+    {
+        var dir = Path.GetDirectoryName(Path.GetFullPath(dbFile));
+        if (dir is not null) Directory.CreateDirectory(dir);
+    }
+
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await context.Database.EnsureCreatedAsync();
 
@@ -136,13 +151,23 @@ app.UseResponseCompression();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseOutputCache();
-app.MapControllers();
+
+// Minimal API endpoints
+app.MapAuthEndpoints();
+app.MapKudosEndpoints();
+app.MapCategoriesEndpoints();
+app.MapLeaderboardEndpoints();
+app.MapNotificationsEndpoints();
+app.MapUsersEndpoints();
+app.MapAiEndpoints();
+
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 
 app.Run();

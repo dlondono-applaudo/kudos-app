@@ -15,6 +15,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.UseEnvironment("Testing");
 
+        builder.UseSetting("Jwt:Key", "TestOnly-SuperSecret-Key-Min32Characters-Long!");
+
         builder.ConfigureServices(services =>
         {
             // Remove existing DbContext registration

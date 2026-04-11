@@ -23,7 +23,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\KudosApp.Api\KudosApp.Api.csproj" />
-    <ProjectReference Include="..\..\src\KudosApp.Core\KudosApp.Core.csproj" />
+    <ProjectReference Include="..\..\src\KudosApp.Domain\KudosApp.Domain.csproj" />
+    <ProjectReference Include="..\..\src\KudosApp.Application\KudosApp.Application.csproj" />
     <ProjectReference Include="..\..\src\KudosApp.Infrastructure\KudosApp.Infrastructure.csproj" />
   </ItemGroup>
 

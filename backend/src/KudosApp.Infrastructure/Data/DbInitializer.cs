@@ -1,4 +1,4 @@
-using KudosApp.Core.Entities;
+using KudosApp.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 

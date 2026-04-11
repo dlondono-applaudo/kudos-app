@@ -1,6 +1,4 @@
-using KudosApp.Core.Interfaces;
 using KudosApp.Infrastructure.Data;
-using KudosApp.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,14 +12,6 @@ public static class DependencyInjection
     {
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
-
-        services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IKudosService, KudosService>();
-
-        // AI services
-        services.AddSingleton<OpenAiService>();
-        services.AddSingleton<IAiSuggestionService>(sp => sp.GetRequiredService<OpenAiService>());
-        services.AddSingleton<IContentModerationService>(sp => sp.GetRequiredService<OpenAiService>());
 
         return services;
     }
