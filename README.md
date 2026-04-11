@@ -20,10 +20,11 @@ A peer-to-peer employee recognition application where employees give each other 
 
 ## Architecture
 
-**Backend — 3-layer Clean Architecture**:
-- `KudosApp.Api` — Controllers, DTOs, Middleware
-- `KudosApp.Core` — Entities, Services, Interfaces, Business logic
-- `KudosApp.Infrastructure` — EF Core, Repositories, External services (OpenAI)
+**Backend — 4-layer Clean Architecture**:
+- `KudosApp.Api` — Minimal API Endpoints, Middleware
+- `KudosApp.Domain` — Entities, DTOs, Interfaces, FluentValidation Validators
+- `KudosApp.Application` — Service implementations, Business logic
+- `KudosApp.Infrastructure` — EF Core DbContext, SQLite
 
 **Frontend — Feature-based**:
 - `core/` — Guards, interceptors, layout (singletons)
@@ -35,29 +36,30 @@ graph TD
     subgraph Frontend["Angular 20 - localhost:4200"]
         UI[Standalone Components]
         Signals[Signal Stores]
-        HTTP[HttpClient + Interceptor]
+        HTTP[HttpClient + Interceptors]
     end
 
     subgraph Backend[".NET 10 API - localhost:5000"]
-        Controllers[Controllers]
-        Services[Services]
-        subgraph Core["Core Layer"]
+        Endpoints[Minimal API Endpoints]
+        subgraph Application["Application Layer"]
+            Services[Services]
+        end
+        subgraph Domain["Domain Layer"]
             Entities[Entities]
             Interfaces[Interfaces]
+            Validators[FluentValidation]
         end
         subgraph Infra["Infrastructure Layer"]
             EF[EF Core + SQLite]
-            OpenAI[OpenAI Service]
         end
     end
 
     UI --> Signals
     Signals --> HTTP
-    HTTP -->|REST API| Controllers
-    Controllers --> Services
+    HTTP -->|REST API| Endpoints
+    Endpoints --> Services
     Services --> Entities
     Services --> EF
-    Services --> OpenAI
 ```
 
 ## Setup & Run
@@ -76,7 +78,7 @@ docker compose up
 ```
 - **Frontend**: http://localhost:4200
 - **API**: http://localhost:5000
-- **Swagger**: http://localhost:5000/swagger
+- **Scalar (API docs)**: http://localhost:5000/scalar/v1
 
 ### Local Development
 ```bash
@@ -104,7 +106,7 @@ ng serve
 ### Extended
 - [x] Badges and achievements
 - [x] Leaderboard
-- [x] Admin dashboard with analytics
+- [x] Admin dashboard
 - [x] Notifications (in-app)
 - [x] Audit logging
 
@@ -121,12 +123,12 @@ dotnet test tests/KudosApp.Tests/KudosApp.Tests.csproj
 ```
 
 **Test coverage** (45 tests):
-- `AuthControllerTests` — registration, login, duplicate email, wrong password
-- `KudosControllerTests` — feed access, auth enforcement, create kudos, admin-only delete, health check
-- `CategoriesControllerTests` — seeded categories, point values, anonymous access
-- `LeaderboardControllerTests` — anonymous access, ranked entries after kudos
-- `NotificationsControllerTests` — auth enforcement, unread count, mark read, kudos-triggered notifications
-- `UsersControllerTests` — profile retrieval, user listing, anonymous profile access
+- `AuthEndpointTests` — registration, login, duplicate email, wrong password
+- `KudosEndpointTests` — feed access, auth enforcement, create kudos, admin-only delete, health check
+- `CategoriesEndpointTests` — seeded categories, point values, anonymous access
+- `LeaderboardEndpointTests` — anonymous access, ranked entries after kudos
+- `NotificationsEndpointTests` — auth enforcement, unread count, mark read, kudos-triggered notifications
+- `UsersEndpointTests` — profile retrieval, user listing, anonymous profile access
 - `KudosEntityTests` — entity creation, self-kudos guard, empty message guard, sentiment emoji
 - `EntityTests` — ApplicationUser, Category, Badge, UserBadge, Notification, AuditLog factories
 - `OpenAiServiceTests` — fallback responses without API key, auto-approval
@@ -189,7 +191,8 @@ kudos-app/
 │   ├── KudosApp.slnx
 │   ├── src/
 │   │   ├── KudosApp.Api/
-│   │   ├── KudosApp.Core/
+│   │   ├── KudosApp.Domain/
+│   │   ├── KudosApp.Application/
 │   │   └── KudosApp.Infrastructure/
 │   └── tests/
 │       └── KudosApp.Tests/

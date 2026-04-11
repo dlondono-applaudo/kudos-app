@@ -2,7 +2,8 @@
   <p class="loading">Loading...</p>
 } @else if (error()) {
   <p class="error">{{ error() }}</p>
-} @else if (profile(); as p) {
+} @else {
+  @let p = profile()!;
   <div class="profile-header">
     <div class="avatar">{{ p.fullName.charAt(0) }}</div>
     <div>
