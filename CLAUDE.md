@@ -10,7 +10,8 @@ kudos-app/
 │   ├── KudosApp.slnx
 │   ├── src/
 │   │   ├── KudosApp.Api/
-│   │   ├── KudosApp.Core/
+│   │   ├── KudosApp.Domain/
+│   │   ├── KudosApp.Application/
 │   │   └── KudosApp.Infrastructure/
 │   └── tests/
 │       └── KudosApp.Tests/
@@ -35,7 +36,10 @@ docker compose up
 ```
 
 ## Key Decisions
-- 3-layer Clean Architecture (Api → Core ← Infrastructure)
+- 4-layer Clean Architecture (Api → Application → Domain ← Infrastructure)
+- Minimal API Endpoints (no Controllers)
+- FluentValidation for request validation (no DataAnnotations)
+- Scalar for interactive API documentation (`/scalar/v1`)
 - No MediatR/CQRS — direct service injection
 - Signal-based state management (no NgRx)
 - SQLite for simplicity (start in-memory, migrate to file)
@@ -44,5 +48,5 @@ docker compose up
 
 ## Conventions
 - Conventional Commits: `feat:`, `fix:`, `chore:`, `docs:`, `test:`
-- Records for DTOs, encapsulated entities, Result<T> pattern
+- Records for DTOs, encapsulated entities
 - Angular: standalone, OnPush, signals, functional guards/interceptors

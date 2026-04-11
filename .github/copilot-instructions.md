@@ -12,12 +12,13 @@ Peer-to-peer employee recognition app where employees give kudos, earn points, a
 
 ## Architecture
 
-### Backend (Clean Architecture — 3 layers)
-- `KudosApp.Api` — Controllers, DTOs (records), Middleware, Extensions, Program.cs
-- `KudosApp.Core` — Entities (encapsulated, not anemic), Interfaces, Services, Exceptions, Constants
-- `KudosApp.Infrastructure` — EF Core DbContext, Repositories, Migrations, External services (OpenAI)
+### Backend (Clean Architecture — 4 layers)
+- `KudosApp.Api` — Minimal API Endpoints, Middleware, Extensions, Program.cs
+- `KudosApp.Domain` — Entities (encapsulated), DTOs (records), Interfaces, FluentValidation Validators
+- `KudosApp.Application` — Service implementations, Business logic, DI registration
+- `KudosApp.Infrastructure` — EF Core DbContext, SQLite
 
-**Dependency rule**: Api → Core + Infrastructure. Infrastructure → Core. Core → nothing.
+**Dependency rule**: Api → Application + Domain. Application → Domain + Infrastructure. Infrastructure → Domain. Domain → nothing.
 
 ### Frontend (Feature-based)
 - `core/` — Singletons: guards (functional), interceptors (functional), layout, error handler
@@ -55,7 +56,9 @@ Peer-to-peer employee recognition app where employees give kudos, earn points, a
 - Kebab-case for folders
 
 ## API Patterns
-- `ApiResponse<T>` wrapper for all API responses
+- Minimal API Endpoints with `MapGroup()` and `WithTags()`
+- FluentValidation for request validation
 - Global exception middleware → ProblemDetails
 - Output caching on GET endpoints
-- Role-based authorization: `[Authorize(Roles = "Admin")]`
+- Role-based authorization: `.RequireAuthorization()` / `.RequireRole("Admin")`
+- Scalar (`/scalar/v1`) for interactive API docs

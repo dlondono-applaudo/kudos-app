@@ -169,6 +169,7 @@ dotnet test tests/KudosApp.Tests/KudosApp.Tests.csproj
 | GET | `/api/users/me` | Bearer | My profile |
 | GET | `/api/users/{id}` | — | User profile |
 | GET | `/api/notifications` | Bearer | My notifications |
+| GET | `/api/notifications/unread-count` | Bearer | Unread notification count |
 | POST | `/api/notifications/{id}/read` | Bearer | Mark read |
 | POST | `/api/notifications/read-all` | Bearer | Mark all read |
 | POST | `/api/ai/suggest-message` | Bearer | AI message suggestions |
@@ -182,7 +183,6 @@ dotnet test tests/KudosApp.Tests/KudosApp.Tests.csproj
 - Quarterly kudos allocation system
 - Gift catalog and point redemption
 - E2E tests with Playwright
-- CI/CD pipeline with GitHub Actions
 
 ## Project Structure
 ```
