@@ -68,6 +68,13 @@ export class KudosService {
     return this.http.get<UserListItem[]>(`${this.api}/users`);
   }
 
+  createUser(request: { email: string; password: string; fullName: string; department: string }) {
+    return this.http.post<{ id: string; email: string; fullName: string; department: string }>(
+      `${this.api}/users`,
+      request,
+    );
+  }
+
   suggestMessage(categoryName: string, intent: string) {
     return this.http.post<{ suggestions: string[] }>(`${this.api}/ai/suggest-message`, {
       categoryName,

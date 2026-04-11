@@ -4,7 +4,28 @@
 
 <div class="admin-grid">
   <section class="panel">
-    <h2>Users ({{ users().length }})</h2>
+    <div class="panel-header">
+      <h2>Users ({{ users().length }})</h2>
+      <button class="btn-create" (click)="toggleCreateForm()">
+        {{ showCreateForm() ? '✕ Cancel' : '+ New User' }}
+      </button>
+    </div>
+
+    @if (showCreateForm()) {
+      <form class="create-form" (ngSubmit)="createUser()">
+        @if (createError()) {
+          <p class="form-error">{{ createError() }}</p>
+        }
+        <input type="text" [(ngModel)]="newUser.fullName" name="fullName" placeholder="Full Name" required />
+        <input type="email" [(ngModel)]="newUser.email" name="email" placeholder="Email" required />
+        <input type="text" [(ngModel)]="newUser.department" name="department" placeholder="Department" required />
+        <input type="password" [(ngModel)]="newUser.password" name="password" placeholder="Password" required />
+        <button type="submit" class="btn-submit" [disabled]="creating()">
+          {{ creating() ? 'Creating...' : 'Create User' }}
+        </button>
+      </form>
+    }
+
     <div class="user-list">
       @for (user of users(); track user.id) {
         <div class="user-row">

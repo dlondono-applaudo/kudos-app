@@ -85,10 +85,10 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(b => b.RequiredPoints).IsRequired();
 
             entity.HasData(
-                new { Id = 1, Name = "First Kudos", Description = "Received your first kudos", Icon = "star", RequiredPoints = 10 },
-                new { Id = 2, Name = "Team Player", Description = "Received 50 points", Icon = "people", RequiredPoints = 50 },
-                new { Id = 3, Name = "Superstar", Description = "Received 100 points", Icon = "trophy", RequiredPoints = 100 },
-                new { Id = 4, Name = "Legend", Description = "Received 250 points", Icon = "crown", RequiredPoints = 250 }
+                new { Id = 1, Name = "First Kudos", Description = "Received your first kudos", Icon = "⭐", RequiredPoints = 10 },
+                new { Id = 2, Name = "Team Player", Description = "Received 50 points", Icon = "👥", RequiredPoints = 50 },
+                new { Id = 3, Name = "Superstar", Description = "Received 100 points", Icon = "🏆", RequiredPoints = 100 },
+                new { Id = 4, Name = "Legend", Description = "Received 250 points", Icon = "👑", RequiredPoints = 250 }
             );
         });
 

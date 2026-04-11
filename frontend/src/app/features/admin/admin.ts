@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
 import { KudosService } from '../../core/services/kudos.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { UserListItem, KudosItem } from '../../core/models/kudos.model';
 
 @Component({
   selector: 'app-admin',
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './admin.html',
   styleUrl: './admin.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -17,6 +18,11 @@ export class Admin implements OnInit {
   recentKudos = signal<KudosItem[]>([]);
   loading = signal(true);
   error = signal('');
+
+  showCreateForm = signal(false);
+  createError = signal('');
+  creating = signal(false);
+  newUser = { email: '', password: '', fullName: '', department: '' };
 
   constructor(
     private kudosService: KudosService,
@@ -40,6 +46,28 @@ export class Admin implements OnInit {
   deleteKudos(id: number) {
     this.kudosService.delete(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.recentKudos.update(list => list.filter(k => k.id !== id));
+    });
+  }
+
+  toggleCreateForm() {
+    this.showCreateForm.update(v => !v);
+    this.createError.set('');
+  }
+
+  createUser() {
+    this.creating.set(true);
+    this.createError.set('');
+    this.kudosService.createUser(this.newUser).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (created) => {
+        this.users.update(list => [...list, { id: created.id, fullName: created.fullName, email: created.email, department: created.department }]);
+        this.newUser = { email: '', password: '', fullName: '', department: '' };
+        this.showCreateForm.set(false);
+        this.creating.set(false);
+      },
+      error: (err) => {
+        this.creating.set(false);
+        this.createError.set(err.error?.message || err.error?.errors?.join(', ') || 'Error creating user');
+      },
     });
   }
 }
