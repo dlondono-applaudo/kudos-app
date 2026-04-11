@@ -29,7 +29,7 @@ cd backend && dotnet build
 cd backend/src/KudosApp.Api && dotnet run
 
 # Frontend
-cd frontend && npm install && ng serve
+cd frontend && npm install && npm start
 
 # Full stack
 docker compose up

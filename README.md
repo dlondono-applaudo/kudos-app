@@ -215,7 +215,6 @@ kudos-app/
 │   │   └── features/
 │   └── ...
 ├── database/               # Reference SQL schema and seed data
-├── docs/                   # Additional documentation
 ├── docker-compose.yml      # Single-command setup
 ├── .env.example            # Environment variable template
 ├── .github/
