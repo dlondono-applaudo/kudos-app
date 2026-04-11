@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using KudosApp.Domain.DTOs.Auth;
 using KudosApp.Domain.DTOs.Users;
 
 namespace KudosApp.Tests;
@@ -96,5 +97,79 @@ public class UsersControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await client.GetAsync("/api/users/nonexistent-id-12345");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task CreateUser_AsAdmin_ReturnsCreated()
+    {
+        var client = _factory.CreateClient();
+        var adminToken = await LoginAsAdminAsync(client);
+        AuthControllerTests.Authenticate(client, adminToken);
+
+        var request = new RegisterRequest("newuser@example.com", "Test123!", "New User", "Marketing");
+        var response = await client.PostAsJsonAsync("/api/users", request);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task CreateUser_AsRegularUser_ReturnsForbidden()
+    {
+        var client = _factory.CreateClient();
+        var (token, _) = await AuthControllerTests.RegisterAndGetTokenAsync(
+            client, "regularuser-create@example.com", "Regular User");
+        AuthControllerTests.Authenticate(client, token);
+
+        var request = new RegisterRequest("another@example.com", "Test123!", "Another User", "Sales");
+        var response = await client.PostAsJsonAsync("/api/users", request);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task CreateUser_DuplicateEmail_ReturnsConflict()
+    {
+        var client = _factory.CreateClient();
+        var adminToken = await LoginAsAdminAsync(client);
+        AuthControllerTests.Authenticate(client, adminToken);
+
+        var request = new RegisterRequest("dupuser@example.com", "Test123!", "Dup User", "HR");
+        await client.PostAsJsonAsync("/api/users", request);
+        var response = await client.PostAsJsonAsync("/api/users", request);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task CreateUser_InvalidRequest_ReturnsValidationError()
+    {
+        var client = _factory.CreateClient();
+        var adminToken = await LoginAsAdminAsync(client);
+        AuthControllerTests.Authenticate(client, adminToken);
+
+        var request = new RegisterRequest("", "", "", "");
+        var response = await client.PostAsJsonAsync("/api/users", request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task CreateUser_Unauthenticated_ReturnsUnauthorized()
+    {
+        var client = _factory.CreateClient();
+
+        var request = new RegisterRequest("unauth@example.com", "Test123!", "Unauth User", "IT");
+        var response = await client.PostAsJsonAsync("/api/users", request);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    private static async Task<string> LoginAsAdminAsync(HttpClient client)
+    {
+        var login = new LoginRequest("admin@kudos.com", "Admin123!");
+        var response = await client.PostAsJsonAsync("/api/auth/login", login);
+        response.EnsureSuccessStatusCode();
+        var auth = await response.Content.ReadFromJsonAsync<AuthResponse>();
+        return auth!.Token;
     }
 }

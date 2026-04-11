@@ -73,7 +73,8 @@ graph TD
 git clone https://github.com/dlondono-applaudo/kudos-app.git
 cd kudos-app
 cp .env.example .env
-# Edit .env and set your OPENAI_API_KEY
+# (Optional) Edit .env and set your OPENAI_API_KEY for AI features
+# The app works without it — AI features use intelligent fallback responses
 docker compose up
 ```
 - **Frontend**: http://localhost:4200
@@ -81,16 +82,26 @@ docker compose up
 - **Scalar (API docs)**: http://localhost:5000/scalar/v1
 
 ### Local Development
+
+> **Prerequisites**: .NET 10 SDK, Node.js 22+
+
 ```bash
-# Backend
+# Backend (terminal 1)
 cd backend
 dotnet run --project src/KudosApp.Api
+# API runs on http://localhost:5000
+# Scalar docs at http://localhost:5000/scalar/v1
 
-# Frontend (separate terminal)
+# Frontend (terminal 2)
 cd frontend
 npm install
-ng serve
+npm start
+# UI runs on http://localhost:4200
 ```
+
+> **Note**: The SQLite database and seed data (categories, badges, admin/test users) are created automatically on first run. No migrations needed.
+> 
+> **AI features**: Set `OpenAI:ApiKey` in `appsettings.json` or the `OPENAI_API_KEY` environment variable. Without it, the app works normally — AI endpoints return smart fallback responses.
 
 ## Features
 
@@ -122,13 +133,13 @@ cd backend
 dotnet test tests/KudosApp.Tests/KudosApp.Tests.csproj
 ```
 
-**Test coverage** (45 tests):
+**Test coverage** (50 tests):
 - `AuthEndpointTests` — registration, login, duplicate email, wrong password
 - `KudosEndpointTests` — feed access, auth enforcement, create kudos, admin-only delete, health check
 - `CategoriesEndpointTests` — seeded categories, point values, anonymous access
 - `LeaderboardEndpointTests` — anonymous access, ranked entries after kudos
 - `NotificationsEndpointTests` — auth enforcement, unread count, mark read, kudos-triggered notifications
-- `UsersEndpointTests` — profile retrieval, user listing, anonymous profile access
+- `UsersEndpointTests` — profile retrieval, user listing, anonymous profile access, admin create user, role enforcement, duplicate email, validation
 - `KudosEntityTests` — entity creation, self-kudos guard, empty message guard, sentiment emoji
 - `EntityTests` — ApplicationUser, Category, Badge, UserBadge, Notification, AuditLog factories
 - `OpenAiServiceTests` — fallback responses without API key, auto-approval
@@ -167,6 +178,7 @@ dotnet test tests/KudosApp.Tests/KudosApp.Tests.csproj
 | GET | `/api/leaderboard` | — | Points leaderboard |
 | GET | `/api/users` | Bearer | All users |
 | GET | `/api/users/me` | Bearer | My profile |
+| POST | `/api/users` | Admin | Create new user |
 | GET | `/api/users/{id}` | — | User profile |
 | GET | `/api/notifications` | Bearer | My notifications |
 | GET | `/api/notifications/unread-count` | Bearer | Unread notification count |
