@@ -1,6 +1,7 @@
 using KudosApp.Core.DTOs.Categories;
 using KudosApp.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 
 namespace KudosApp.Api.Controllers;
@@ -17,6 +18,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet]
+    [OutputCache(Duration = 3600)]
     public async Task<ActionResult<IReadOnlyList<CategoryResponse>>> GetAll()
     {
         var categories = await _context.Categories

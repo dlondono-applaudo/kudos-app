@@ -1,4 +1,5 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -8,8 +9,10 @@ import { AuthService } from '../../../core/auth/auth.service';
   imports: [FormsModule, RouterLink],
   templateUrl: './register.html',
   styleUrl: './register.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Register {
+  private destroyRef = inject(DestroyRef);
   email = '';
   password = '';
   fullName = '';
@@ -30,6 +33,7 @@ export class Register {
         fullName: this.fullName,
         department: this.department,
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.loading.set(false);

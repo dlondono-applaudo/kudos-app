@@ -1,6 +1,7 @@
 using KudosApp.Core.DTOs.Leaderboard;
 using KudosApp.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 
 namespace KudosApp.Api.Controllers;
@@ -17,6 +18,7 @@ public class LeaderboardController : ControllerBase
     }
 
     [HttpGet]
+    [OutputCache(Duration = 900)]
     public async Task<ActionResult<IReadOnlyList<LeaderboardEntry>>> GetLeaderboard(
         [FromQuery] int top = 10)
     {

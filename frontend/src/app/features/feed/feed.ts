@@ -1,4 +1,5 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { KudosService } from '../../core/services/kudos.service';
 import { AuthService } from '../../core/auth/auth.service';
@@ -9,8 +10,10 @@ import { Category, CreateKudosRequest, KudosItem, UserListItem } from '../../cor
   imports: [FormsModule],
   templateUrl: './feed.html',
   styleUrl: './feed.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Feed implements OnInit {
+  private destroyRef = inject(DestroyRef);
   items = signal<KudosItem[]>([]);
   categories = signal<Category[]>([]);
   users = signal<UserListItem[]>([]);
@@ -37,8 +40,8 @@ export class Feed implements OnInit {
 
   ngOnInit() {
     this.loadFeed();
-    this.kudosService.getCategories().subscribe(c => this.categories.set(c));
-    this.kudosService.getUsers().subscribe(u => {
+    this.kudosService.getCategories().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(c => this.categories.set(c));
+    this.kudosService.getUsers().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(u => {
       const me = this.auth.currentUser()?.id;
       this.users.set(u.filter(user => user.id !== me));
     });
@@ -46,7 +49,7 @@ export class Feed implements OnInit {
 
   loadFeed() {
     this.loading.set(true);
-    this.kudosService.getFeed(this.page()).subscribe({
+    this.kudosService.getFeed(this.page()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: res => {
         this.items.set(res.items);
         this.totalCount.set(res.totalCount);
@@ -77,7 +80,7 @@ export class Feed implements OnInit {
     const cat = this.categories().find(c => c.id === +this.categoryId);
     if (!cat || !this.suggestIntent.trim()) return;
     this.suggesting.set(true);
-    this.kudosService.suggestMessage(cat.name, this.suggestIntent.trim()).subscribe({
+    this.kudosService.suggestMessage(cat.name, this.suggestIntent.trim()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: res => {
         this.suggestions.set(res.suggestions);
         this.suggesting.set(false);
@@ -102,7 +105,7 @@ export class Feed implements OnInit {
       message: this.message.trim(),
     };
 
-    this.kudosService.create(request).subscribe({
+    this.kudosService.create(request).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.sending.set(false);
         this.showForm.set(false);

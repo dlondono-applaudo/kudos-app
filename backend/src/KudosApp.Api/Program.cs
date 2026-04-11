@@ -74,6 +74,16 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+// Response compression
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.EnableForHttps = true;
+    opts.MimeTypes = Microsoft.AspNetCore.ResponseCompression.ResponseCompressionDefaults.MimeTypes;
+});
+
+// Output caching
+builder.Services.AddOutputCache();
+
 // CORS for Angular dev server
 builder.Services.AddCors(options =>
 {
@@ -100,6 +110,29 @@ using (var scope = app.Services.CreateScope())
     await DbInitializer.SeedAsync(roleManager, userManager, logger);
 }
 
+// Global exception handler — never expose stack traces
+app.UseExceptionHandler(exceptionApp =>
+{
+    exceptionApp.Run(async context =>
+    {
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+        var exception = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>()?.Error;
+        logger.LogError(exception, "Unhandled exception at {Path}", context.Request.Path);
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/problem+json";
+        await context.Response.WriteAsJsonAsync(new
+        {
+            type = "https://tools.ietf.org/html/rfc7807",
+            title = "An unexpected error occurred",
+            status = 500,
+            traceId = context.TraceIdentifier
+        });
+    });
+});
+
+app.UseResponseCompression();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -108,6 +141,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseOutputCache();
 app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 

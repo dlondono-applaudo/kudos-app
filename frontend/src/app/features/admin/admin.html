@@ -22,6 +22,8 @@
     <h2>Recent Kudos</h2>
     @if (loading()) {
       <p class="loading">Loading...</p>
+    } @else if (error()) {
+      <p class="error">{{ error() }}</p>
     } @else {
       <div class="kudos-list">
         @for (item of recentKudos(); track item.id) {

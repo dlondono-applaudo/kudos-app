@@ -33,6 +33,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         {
             entity.HasKey(c => c.Id);
             entity.Property(c => c.Name).HasMaxLength(50).IsRequired();
+            entity.HasIndex(c => c.Name).IsUnique();
             entity.Property(c => c.Description).HasMaxLength(200).IsRequired();
             entity.Property(c => c.PointValue).IsRequired();
 

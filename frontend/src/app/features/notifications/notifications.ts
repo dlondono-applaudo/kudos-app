@@ -1,4 +1,5 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { KudosService } from '../../core/services/kudos.service';
 import { NotificationItem } from '../../core/models/kudos.model';
 
@@ -7,25 +8,31 @@ import { NotificationItem } from '../../core/models/kudos.model';
   imports: [],
   templateUrl: './notifications.html',
   styleUrl: './notifications.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Notifications implements OnInit {
+  private destroyRef = inject(DestroyRef);
   items = signal<NotificationItem[]>([]);
   loading = signal(true);
+  error = signal('');
 
   constructor(private kudosService: KudosService) {}
 
   ngOnInit() {
-    this.kudosService.getNotifications().subscribe({
+    this.kudosService.getNotifications().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: data => {
         this.items.set(data);
         this.loading.set(false);
       },
-      error: () => this.loading.set(false),
+      error: (err) => {
+        this.loading.set(false);
+        this.error.set(err.error?.message || 'Error loading notifications');
+      },
     });
   }
 
   markRead(id: number) {
-    this.kudosService.markNotificationRead(id).subscribe(() => {
+    this.kudosService.markNotificationRead(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.items.update(list =>
         list.map(n => (n.id === id ? { ...n, isRead: true } : n)),
       );
@@ -33,7 +40,7 @@ export class Notifications implements OnInit {
   }
 
   markAllRead() {
-    this.kudosService.markAllRead().subscribe(() => {
+    this.kudosService.markAllRead().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.items.update(list => list.map(n => ({ ...n, isRead: true })));
     });
   }
