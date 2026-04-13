@@ -3,7 +3,8 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 COPY KudosApp.slnx .
-COPY src/KudosApp.Core/KudosApp.Core.csproj src/KudosApp.Core/
+COPY src/KudosApp.Domain/KudosApp.Domain.csproj src/KudosApp.Domain/
+COPY src/KudosApp.Application/KudosApp.Application.csproj src/KudosApp.Application/
 COPY src/KudosApp.Infrastructure/KudosApp.Infrastructure.csproj src/KudosApp.Infrastructure/
 COPY src/KudosApp.Api/KudosApp.Api.csproj src/KudosApp.Api/
 
