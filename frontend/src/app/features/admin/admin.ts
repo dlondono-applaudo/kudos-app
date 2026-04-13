@@ -66,7 +66,15 @@ export class Admin implements OnInit {
       },
       error: (err) => {
         this.creating.set(false);
-        this.createError.set(err.error?.message || err.error?.errors?.join(', ') || 'Error creating user');
+        const body = err.error;
+        let msg = 'Error creating user';
+        if (body?.message) {
+          msg = body.message;
+        } else if (body?.errors) {
+          const errs = body.errors;
+          msg = Array.isArray(errs) ? errs.join(', ') : Object.values(errs).flat().join(', ');
+        }
+        this.createError.set(msg);
       },
     });
   }
