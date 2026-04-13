@@ -1,8 +1,10 @@
+using System.ClientModel;
 using System.Text.Json;
 using KudosApp.Domain.DTOs.Ai;
 using KudosApp.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using OpenAI;
 using OpenAI.Chat;
 
 namespace KudosApp.Application.Services;
@@ -25,8 +27,18 @@ public class OpenAiService : IAiSuggestionService, IContentModerationService
 
         if (!string.IsNullOrWhiteSpace(apiKey))
         {
-            _chatClient = new ChatClient(_model, apiKey);
-            _logger.LogInformation("OpenAI service initialized with model {Model}", _model);
+            if (apiKey.StartsWith("ghp_") || apiKey.StartsWith("github_pat_"))
+            {
+                var credential = new ApiKeyCredential(apiKey);
+                var options = new OpenAIClientOptions { Endpoint = new Uri("https://models.inference.ai.azure.com") };
+                _chatClient = new ChatClient(_model, credential, options);
+                _logger.LogInformation("AI service initialized via GitHub Models with model {Model}", _model);
+            }
+            else
+            {
+                _chatClient = new ChatClient(_model, apiKey);
+                _logger.LogInformation("AI service initialized via OpenAI with model {Model}", _model);
+            }
         }
         else
         {
