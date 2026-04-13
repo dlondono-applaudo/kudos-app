@@ -1,5 +1,7 @@
 using System.Text;
 using KudosApp.Api.Endpoints;
+using KudosApp.Api.Middleware;
+using KudosApp.Api.Services;
 using KudosApp.Application;
 using KudosApp.Domain.Entities;
 using KudosApp.Infrastructure;
@@ -90,6 +92,9 @@ builder.Services.AddResponseCompression(opts =>
 // Output caching
 builder.Services.AddOutputCache();
 
+// End-to-end encryption service (RSA key pair lives for the app lifetime)
+builder.Services.AddSingleton<CryptoService>();
+
 // CORS for Angular dev server
 builder.Services.AddCors(options =>
 {
@@ -148,6 +153,9 @@ app.UseExceptionHandler(exceptionApp =>
 
 app.UseResponseCompression();
 
+// Decrypt encrypted request bodies before they reach endpoints
+app.UseMiddleware<DecryptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -167,6 +175,7 @@ app.MapLeaderboardEndpoints();
 app.MapNotificationsEndpoints();
 app.MapUsersEndpoints();
 app.MapAiEndpoints();
+app.MapCryptoEndpoints();
 
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 

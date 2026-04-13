@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/auth/auth.interceptor';
+import { encryptionInterceptor } from './core/auth/encryption.interceptor';
 import { timeoutInterceptor } from './core/auth/timeout.interceptor';
 
 export const appConfig: ApplicationConfig = {
@@ -10,6 +11,6 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor, timeoutInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, encryptionInterceptor, timeoutInterceptor])),
   ],
 };
